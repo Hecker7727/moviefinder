@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .movie-card {
+            background-color: #1f1f1f;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .movie-card img {
+            width: 100%;
+            height: auto;
+        }
+        .movie-card .details {
+            padding: 10px;
+            text-align: center;
+        }
+        .movie-card .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .movie-card .year {
+            font-size: 14px;
+            color: #aaa;
+        }
+        .movie-card .rating {
+            font-size: 14px;
+            color: #ffc107;
+        }
+        .movie-card .genre {
+            font-size: 14px;
+            color: #aaa;
+        }
+        .movie-card .plot {
+            font-size: 14px;
+            color: #ccc;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Search</h1>
+        <input type="text" id="search" placeholder="Enter movie name..... " autocomplete="off">
+        <div class="movie-grid" id="movie-grid"></div>
+    </div>
+
+    <script>
+        document.getElementById('search').addEventListener('input', function() {
+            let query = this.value;
+            if (query.length > 2) {
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'query=' + encodeURIComponent(query)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let movieGrid = document.getElementById('movie-grid');
+                    movieGrid.innerHTML = '';
+                    data.forEach(movie => {
+                        let div = document.createElement('div');
+                        div.className = 'movie-card';
+                        div.innerHTML = `
+                            <img src="${movie.Poster}" alt="${movie.Title}">
+                            <div class="details">
+                                <div class="title">${movie.Title}</div>
+                                <div class="year">${movie.Year}</div>
+                                <div class="rating">IMDb Rating: ${movie.imdbRating || 'N/A'}</div>
+                                <div class="genre">${movie.Genre}</div>
+                                <div class="plot">${movie.Plot}</div>
+                            </div>
+                        `;
+                        div.addEventListener('click', function() {
+                            window.location.href = '/play/' + movie.imdbID;
+                        });
+                        movieGrid.appendChild(div);
+                    });
+                });
+            } else {
+                document.getElementById('movie-grid').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
