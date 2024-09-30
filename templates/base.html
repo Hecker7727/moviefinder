@@ -3,114 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Movie App{% endblock %}</title>
+    <title>{% block title %}Flask App{% endblock %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #141414;
+            background: #141414;  /* Dark background */
             color: #fff;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+            transition: background 0.5s;  /* Smooth background transition */
         }
         .navbar {
+            background-color: rgba(31, 31, 31, 0.9);
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #1f1f1f;
-            padding: 10px 20px;
-            margin-bottom: 20px;
         }
         .navbar a {
             color: #fff;
+            margin: 0 15px;
             text-decoration: none;
-            margin-right: 20px;
+            transition: color 0.3s;
         }
         .navbar a:hover {
-            text-decoration: underline;
+            color: #5cb85c;  /* Highlight color on hover */
         }
-        .navbar .logo {
-            font-size: 24px;
-            font-weight: bold;
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(31, 31, 31, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease;  /* Fade in animation */
         }
-        .navbar .links {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .movie-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;  /* Smooth hover transitions */
+            cursor: pointer;  /* Indicate clickable */
+        }
+        .movie-card:hover {
+            transform: scale(1.05);  /* Slight enlargement on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);  /* Shadow effect on hover */
+        }
+        .movie-card img {
+            width: 150px;  /* Thumbnail size */
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: transform 0.3s;  /* Transition for image zoom */
+        }
+        .movie-card img:hover {
+            transform: scale(1.1);  /* Zoom in on image hover */
+        }
+        .actor-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;  /* Smooth hover transitions */
+        }
+        .actor-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;  /* Make the image round */
+            margin-bottom: 10px;
+            transition: transform 0.3s;  /* Transition for image zoom */
+        }
+        .actor-card img:hover {
+            transform: scale(1.1);  /* Zoom in on image hover */
+        }
+        .search-bar {
             display: flex;
             align-items: center;
         }
-        .navbar .links a {
-            margin-left: 20px;
-        }
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .movie-card {
-            background-color: #1f1f1f;
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .movie-card:hover {
-            transform: scale(1.05);
-        }
-        .movie-card img {
-            width: 100%;
-            height: auto;
-        }
-        .movie-card .details {
+        .search-bar input {
             padding: 10px;
-            text-align: center;
-        }
-        .movie-card .title {
             font-size: 16px;
-            font-weight: bold;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: border-color 0.3s;
+        }
+        .search-bar input:focus {
+            border-color: #5cb85c;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #5cb85c;
             color: #fff;
-            margin-bottom: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .movie-card .year {
-            font-size: 14px;
-            color: #aaa;
+        .search-bar button:hover {
+            background-color: #4cae4c;
         }
-        .movie-card .rating {
-            font-size: 14px;
-            color: #ffc107;
+        .search-recommendations {
+            position: absolute;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
         }
-        .movie-card .genre {
-            font-size: 14px;
-            color: #aaa;
+        .search-recommendations div {
+            padding: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .movie-card .plot {
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 10px;
+        .search-recommendations div:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">Movie App</div>
-        <div class="links">
-            <a href="/">Home</a>
-            <a href="/recent">Recent Watched</a>
-            <a href="/genre/Action">Action</a>
-            <a href="/genre/Comedy">Comedy</a>
-            <a href="/genre/Drama">Drama</a>
-            <a href="/genre/Sci-Fi">Sci-Fi</a>
-            <a href="/genre/Thriller">Thriller</a>
-            <a href="/language/English">English</a>
-            <a href="/language/Spanish">Spanish</a>
-            <a href="/language/French">French</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Movie App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if session['username'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <form class="form-inline ml-auto" action="{{ url_for('search') }}" method="get">
+                <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search for a movie..." aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
         </div>
-    </div>
+    </nav>
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function searchMovies() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                window.location.href = `{{ url_for('search') }}?query=${query}`;
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value;
+            const recommendationsDiv = document.getElementById('searchRecommendations');
+            if (query) {
+                fetch(`/search_recommendations?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        recommendationsDiv.innerHTML = '';
+                        data.forEach(movie => {
+                            const div = document.createElement('div');
+                            div.textContent = movie.Title;
+                            div.onclick = function() {
+                                window.location.href = `{{ url_for('movie', imdb_id='') }}${movie.imdbID}`;
+                            };
+                            recommendationsDiv.appendChild(div);
+                        });
+                        recommendationsDiv.style.display = 'block';
+                    });
+            } else {
+                recommendationsDiv.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

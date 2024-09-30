@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ username }}!</h2>
+<h3>Your Watchlist</h3>
+<div class="movie-results" style="display: flex; flex-wrap: wrap; justify-content: center;">
+    {% for imdb_id in watchlist %}
+        <div class="movie-card" onclick="window.location.href='{{ url_for('movie', imdb_id=imdb_id) }}'">
+            {% set movie_response = requests.get(f'http://www.omdbapi.com/?i={imdb_id}&apikey=bb1856c2') %}
+            {% if movie_response.status_code == 200 %}
+                {% set movie_data = movie_response.json() %}
+                <img src="{{ movie_data.Poster }}" alt="{{ movie_data.Title }}">
+                <h4>{{ movie_data.Title }} ({{ movie_data.Year }})</h4>
+            {% else %}
+                <h4>Movie not found</h4>
+            {% endif %}
+            <a href="{{ url_for('remove_from_watchlist', imdb_id=imdb_id) }}">
+                <button>Remove from Watchlist</button>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

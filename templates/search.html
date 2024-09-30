@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Movies{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Search Movies</h2>
+<form action="{{ url_for('search') }}" method="get" class="form-inline justify-content-center">
+    <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search for a movie..." value="{{ query }}" aria-label="Search">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+
+{% if movies %}
+    <h3 class="text-center mt-4">Search Results</h3>
+    <div class="row">
+        {% for movie in movies %}
+            <div class="col-md-3 mb-4">
+                <div class="movie-card" onclick="window.location.href='{{ url_for('movie', imdb_id=movie.imdbID) }}'">
+                    <img src="{{ movie.Poster }}" alt="{{ movie.Title }}" class="img-fluid">
+                    <h4 class="text-center mt-2">{{ movie.Title }} ({{ movie.Year }})</h4>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if recommendations %}
+    <div class="recommendation">
+        <h3 class="text-center mt-4">Similar Movies</h3>
+        <div class="row">
+            {% for rec_movie in recommendations %}
+                <div class="col-md-3 mb-4">
+                    <div class="movie-card" onclick="window.location.href='{{ url_for('movie', imdb_id=rec_movie.imdbID) }}'">
+                        <img src="{{ rec_movie.Poster }}" alt="{{ rec_movie.Title }}" class="img-fluid">
+                        <h4 class="text-center mt-2">{{ rec_movie.Title }} ({{ rec_movie.Year }})</h4>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% if query == 'q1w2e3r4' %}
+    <div class="adult-movies">
+        <h3 class="text-center mt-4">18+ Adult Movies</h3>
+        <a href="{{ url_for('adult_movies') }}" class="btn btn-primary btn-lg btn-block">View 18+ Adult Movies</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}18+ Adult Movies{% endblock %}
+
+{% block content %}
+<h2 class="text-center">18+ Adult Movies</h2>
+<div class="row">
+    {% for movie in adult_movies %}
+        <div class="col-md-3 mb-4">
+            <div class="movie-card" onclick="window.location.href='{{ url_for('movie', imdb_id=movie.imdbID) }}'">
+                <img src="{{ movie.Poster }}" alt="{{ movie.Title }}" class="img-fluid">
+                <h4 class="text-center mt-2">{{ movie.Title }} ({{ movie.Year }})</h4>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

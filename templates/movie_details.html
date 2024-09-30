@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.Title }}{% endblock %}
+
+{% block content %}
+<h2>{{ movie.Title }}</h2>
+<img src="{{ movie.Poster }}" alt="{{ movie.Title }}">
+<p><strong>Year:</strong> {{ movie.Year }}</p>
+<p><strong>IMDb Rating:</strong> {{ movie.imdbRating }}</p>
+<p><strong>Genre:</strong> {{ movie.Genre }}</p>
+<p><strong>Plot:</strong> {{ movie.Plot }}</p>
+<p><strong>Actors:</strong></p>
+<div class="actor-results" style="display: flex; flex-wrap: wrap; justify-content: center;">
+    {% for actor, image in actor_images.items() %}
+        <div class="actor-card">
+            <img src="{{ image }}" alt="{{ actor }}">
+            <h4>{{ actor }}</h4>
+        </div>
+    {% endfor %}
+</div>
+<a href="{{ url_for('play', imdb_id=movie.imdbID) }}">
+    <button>Play Movie</button>
+</a>
+<a href="{{ url_for('search') }}">
+    <button>Back to Search</button>
+</a>
+
+<div class="recommendation">
+    <h3>Similar Movies</h3>
+    <div class="movie-results" style="display: flex; flex-wrap: wrap; justify-content: center;">
+        {% for rec_movie in recommendations %}
+            <div class="movie-card" onclick="window.location.href='{{ url_for('movie', imdb_id=rec_movie.imdbID) }}'">
+                <img src="{{ rec_movie.Poster }}" alt="{{ rec_movie.Title }}">
+                <h4>{{ rec_movie.Title }} ({{ rec_movie.Year }})</h4>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
